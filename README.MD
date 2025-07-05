@@ -152,7 +152,3 @@ The chatbot includes an automated crisis detection system that:
 1. Identifies potential crisis situations
 2. Provides immediate helpline information
 3. Encourages professional help when needed
-
-## Contributing
-
-Contributions are welcome! Please read our contributing guidelines before submitting pull requests.
