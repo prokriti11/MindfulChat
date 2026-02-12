@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MindfulChat Admin Panel - Manage users and chat sessions">
+    <title>Admin Panel — MindfulChat</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="logo-icon" style="width: 40px; height: 40px; font-size: 20px;">🧠</div>
+                <h1>MindfulChat Admin</h1>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <a href="/" class="action-btn edit" style="padding: 10px 18px; text-decoration: none;">← Back to
+                    Chat</a>
+                <button class="action-btn delete" style="padding: 10px 18px;" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="totalUsers">—</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💬</div>
+                <div class="stat-value" id="totalChats">—</div>
+                <div class="stat-label">Total Conversations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🆘</div>
+                <div class="stat-value" id="crisisChats">—</div>
+                <div class="stat-label">Crisis Detections</div>
+            </div>
+        </div>
+
+        <!-- Users Section -->
+        <div class="admin-section">
+            <h2>👥 Users</h2>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted);">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Chats Section -->
+        <div class="admin-section">
+            <h2>💬 Recent Conversations</h2>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Title</th>
+                        <th>Messages</th>
+                        <th>Last Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="chatsTableBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted);">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Edit User Modal -->
+        <div class="modal-overlay" id="editModal">
+            <div class="modal">
+                <h3>Edit User</h3>
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label for="editUsername">Username</label>
+                    <input type="text" id="editUsername">
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email</label>
+                    <input type="email" id="editEmail">
+                </div>
+                <div class="form-group">
+                    <label for="editRole">Role</label>
+                    <select id="editRole"
+                        style="width: 100%; padding: 12px 16px; background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: var(--text-primary); font-family: var(--font); font-size: 0.95rem;">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+                    <button class="modal-btn primary" onclick="saveUser()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Viewer Modal -->
+        <div class="modal-overlay" id="chatModal">
+            <div class="modal" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+                <h3 id="chatModalTitle">Chat Details</h3>
+                <div id="chatModalContent"></div>
+                <div class="modal-actions">
+                    <button class="modal-btn secondary" onclick="closeChatModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/admin.js"></script>
+</body>
+
+</html>

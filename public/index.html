@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MindfulChat - Your AI mental health companion for emotional support and wellness">
+  <title>MindfulChat — AI Mental Health Companion</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">🧠</div>
+          <h1>MindfulChat</h1>
+        </div>
+        <button class="new-chat-btn" id="newChatBtn" onclick="startNewChat()">
+          ✨ New Conversation
+        </button>
+      </div>
+
+      <div class="chat-list" id="chatList">
+        <!-- Chat history items loaded dynamically -->
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-details">
+            <div class="name" id="userName">User</div>
+            <div class="email" id="userEmail">user@email.com</div>
+          </div>
+          <button class="logout-btn" onclick="logout()" title="Logout">⏻</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Chat Area -->
+    <main class="chat-main">
+      <div class="chat-header" id="chatHeader">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button class="logout-btn" id="menuBtn" onclick="toggleSidebar()" style="display:none;">☰</button>
+          <h2 id="chatTitle">MindfulChat</h2>
+        </div>
+        <div id="currentSentiment"></div>
+      </div>
+
+      <!-- Welcome Screen (shown when no chat is active) -->
+      <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-icon">🧠</div>
+        <h2>Welcome to MindfulChat</h2>
+        <p>I'm your compassionate AI companion. Share what's on your mind — I'm here to listen, support, and help you navigate your feelings.</p>
+        <div class="quick-prompts">
+          <button class="quick-prompt" onclick="sendQuickPrompt('I\'ve been feeling really stressed about work lately')">
+            <span class="prompt-icon">😰</span>
+            I'm feeling stressed about work
+          </button>
+          <button class="quick-prompt" onclick="sendQuickPrompt('I\'m struggling with anxiety and can\'t stop worrying')">
+            <span class="prompt-icon">😟</span>
+            I'm struggling with anxiety
+          </button>
+          <button class="quick-prompt" onclick="sendQuickPrompt('I feel lonely and like nobody understands me')">
+            <span class="prompt-icon">😔</span>
+            I'm feeling lonely
+          </button>
+          <button class="quick-prompt" onclick="sendQuickPrompt('I want to learn some techniques to manage my emotions better')">
+            <span class="prompt-icon">🌱</span>
+            Help me manage emotions
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Container (shown during active chat) -->
+      <div class="messages-container" id="messagesContainer" style="display: none;"></div>
+
+      <!-- Typing Indicator -->
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="message-avatar" style="background: var(--accent-gradient); box-shadow: var(--shadow-glow);">🧠</div>
+        <div class="typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="input-area">
+        <div class="input-wrapper">
+          <textarea
+            class="message-input"
+            id="messageInput"
+            placeholder="Share what's on your mind..."
+            rows="1"
+            maxlength="2000"
+          ></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

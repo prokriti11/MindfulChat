@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: mindfulchat
+    runtime: docker
+    plan: free
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: PORT
+        value: 3000
+      - key: SENTIMENT_SERVICE_URL
+        value: http://localhost:5001

@@ -1,0 +1,6 @@
+node_modules/
+.env
+__pycache__/
+*.pyc
+sentiment_service/model/
+.DS_Store
