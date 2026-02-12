@@ -10,7 +10,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
 
-# Install Python dependencies
+# Install Python dependencies (lightweight — no PyTorch in production)
 COPY sentiment_service/requirements.txt ./sentiment_service/
 RUN python3 -m venv /app/venv && \
     /app/venv/bin/pip install --no-cache-dir -r sentiment_service/requirements.txt
@@ -22,4 +22,4 @@ COPY . .
 EXPOSE 3000
 
 # Start script: launches both Python sentiment service and Node.js server
-CMD bash -c "/app/venv/bin/python sentiment_service/app.py & sleep 3 && node app.js"
+CMD bash -c "/app/venv/bin/python sentiment_service/app.py & sleep 2 && node app.js"
