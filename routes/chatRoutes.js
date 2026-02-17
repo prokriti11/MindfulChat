@@ -3,6 +3,9 @@ const router = express.Router();
 const chatController = require('../controllers/chatController');
 const auth = require('../middleware/auth');
 
+// POST /api/chat/start — Start new conversation with mood check-in
+router.post('/start', auth, chatController.startConversation);
+
 // POST /api/chat/message — Send message to chatbot
 router.post('/message', auth, chatController.sendMessage);
 

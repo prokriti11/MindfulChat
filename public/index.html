@@ -47,33 +47,77 @@
         <div id="currentSentiment"></div>
       </div>
 
+      <!-- Crisis Banner (hidden by default, shown when crisis detected) -->
+      <div class="crisis-banner" id="crisisBanner" style="display: none;">
+        <div class="crisis-banner-content">
+          <span class="crisis-banner-icon">🆘</span>
+          <div class="crisis-banner-text">
+            <strong>Crisis Support Available 24/7</strong>
+            <div class="crisis-numbers">
+              <a href="tel:988">📞 988 Lifeline (US)</a>
+              <a href="sms:741741?body=HOME">💬 Text HOME to 741741</a>
+              <a href="tel:9152987821">📞 iCall: 9152987821</a>
+              <a href="tel:18602662345">📞 Vandrevala: 1860-2662-345</a>
+              <a href="tel:9820466726">📞 AASRA: 9820466726</a>
+            </div>
+          </div>
+          <button class="crisis-banner-close" onclick="closeCrisisBanner()">✕</button>
+        </div>
+      </div>
+
       <!-- Welcome Screen (shown when no chat is active) -->
       <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-icon">🧠</div>
         <h2>Welcome to MindfulChat</h2>
-        <p>I'm your compassionate AI companion. Share what's on your mind — I'm here to listen, support, and help you navigate your feelings.</p>
+        <p>I'm your compassionate AI companion for mental health support. I'll start by understanding how you're feeling, then provide personalized guidance.</p>
+        <div class="welcome-features">
+          <div class="feature-item">
+            <span class="feature-icon">🎯</span>
+            <span>Personalized mood check-in</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🧘</span>
+            <span>Guided exercises & techniques</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🛡️</span>
+            <span>Crisis detection & helplines</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">💙</span>
+            <span>Evidence-based coping strategies</span>
+          </div>
+        </div>
+        <button class="start-chat-btn" onclick="beginNewConversation()">
+          <span class="start-icon">💬</span>
+          Start a Conversation
+        </button>
         <div class="quick-prompts">
+          <p class="quick-prompts-label">Or jump straight in:</p>
           <button class="quick-prompt" onclick="sendQuickPrompt('I\'ve been feeling really stressed about work lately')">
             <span class="prompt-icon">😰</span>
-            I'm feeling stressed about work
+            I'm feeling stressed
           </button>
           <button class="quick-prompt" onclick="sendQuickPrompt('I\'m struggling with anxiety and can\'t stop worrying')">
             <span class="prompt-icon">😟</span>
-            I'm struggling with anxiety
+            Struggling with anxiety
           </button>
           <button class="quick-prompt" onclick="sendQuickPrompt('I feel lonely and like nobody understands me')">
             <span class="prompt-icon">😔</span>
-            I'm feeling lonely
+            Feeling lonely
           </button>
-          <button class="quick-prompt" onclick="sendQuickPrompt('I want to learn some techniques to manage my emotions better')">
-            <span class="prompt-icon">🌱</span>
-            Help me manage emotions
+          <button class="quick-prompt" onclick="sendQuickPrompt('Help me with a grounding exercise')">
+            <span class="prompt-icon">🧘</span>
+            Guide me through an exercise
           </button>
         </div>
       </div>
 
       <!-- Messages Container (shown during active chat) -->
       <div class="messages-container" id="messagesContainer" style="display: none;"></div>
+
+      <!-- Quick Replies Container (for mood assessment chips) -->
+      <div class="quick-replies-container" id="quickRepliesContainer" style="display: none;"></div>
 
       <!-- Typing Indicator -->
       <div class="typing-indicator" id="typingIndicator">

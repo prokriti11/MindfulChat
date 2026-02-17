@@ -34,6 +34,17 @@ const chatSchema = new mongoose.Schema({
         type: String,
         default: 'New Conversation'
     },
+    moodState: {
+        stage: {
+            type: String,
+            enum: ['greeting', 'q1_duration', 'q2_impact', 'q3_support', 'assessed'],
+            default: 'greeting'
+        },
+        mood: { type: String, default: null },
+        duration: { type: String, default: null },
+        impact: { type: String, default: null },
+        support: { type: String, default: null }
+    },
     messages: [messageSchema],
     createdAt: {
         type: Date,

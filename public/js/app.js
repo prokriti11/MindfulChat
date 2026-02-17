@@ -59,6 +59,50 @@ function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
 }
 
+// ─── Begin New Conversation (with mood check-in) ────
+async function beginNewConversation() {
+    showChatArea();
+    showTyping(true);
+
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.disabled = true;
+
+    try {
+        const response = await fetch(`${API_BASE}/api/chat/start`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to start conversation');
+        }
+
+        currentChatId = data.chatId;
+
+        // Show bot greeting
+        addMessage('assistant', data.response);
+
+        // Show quick reply chips if available
+        if (data.quickReplies) {
+            renderQuickReplies(data.quickReplies);
+        }
+
+        loadChatHistory();
+
+    } catch (error) {
+        console.error('Start conversation error:', error);
+        addMessage('assistant', '⚠️ I had trouble starting up. Please try again in a moment. 💙');
+    } finally {
+        showTyping(false);
+        sendBtn.disabled = false;
+    }
+}
+
 // ─── Send Message ───────────────────────────────────
 async function sendMessage() {
     const input = document.getElementById('messageInput');
@@ -68,6 +112,9 @@ async function sendMessage() {
 
     // Show chat area, hide welcome
     showChatArea();
+
+    // Hide any existing quick replies
+    hideQuickReplies();
 
     // Add user message to UI
     addMessage('user', message);
@@ -84,6 +131,24 @@ async function sendMessage() {
     sendBtn.disabled = true;
 
     try {
+        // If no chat started yet, the first message goes via /start then /message
+        if (!currentChatId) {
+            // Start a new conversation first
+            const startResponse = await fetch(`${API_BASE}/api/chat/start`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const startData = await startResponse.json();
+            if (startResponse.ok) {
+                currentChatId = startData.chatId;
+                // Don't show the greeting since user already typed something
+                // The greeting is saved in DB, now send user's actual message
+            }
+        }
+
         const response = await fetch(`${API_BASE}/api/chat/message`, {
             method: 'POST',
             headers: {
@@ -112,11 +177,16 @@ async function sendMessage() {
 
         // Show crisis alert if detected
         if (data.isCrisis) {
-            showCrisisAlert();
+            showCrisisBanner();
         }
 
         // Add bot response
         addMessage('assistant', data.response, data.sentiment);
+
+        // Show quick reply chips if available (mood flow)
+        if (data.quickReplies && data.quickReplies.length > 0) {
+            renderQuickReplies(data.quickReplies);
+        }
 
         // Refresh chat list
         loadChatHistory();
@@ -130,10 +200,38 @@ async function sendMessage() {
     }
 }
 
-// ─── Quick Prompts ──────────────────────────────────
+// ─── Quick Prompts (from welcome screen) ────────────
 function sendQuickPrompt(message) {
     document.getElementById('messageInput').value = message;
     sendMessage();
+}
+
+// ─── Quick Reply Chips (mood flow) ──────────────────
+function renderQuickReplies(replies) {
+    const container = document.getElementById('quickRepliesContainer');
+    container.innerHTML = '';
+    container.style.display = 'flex';
+
+    replies.forEach(reply => {
+        const chip = document.createElement('button');
+        chip.className = 'quick-reply-chip';
+        chip.textContent = reply.label;
+        chip.onclick = () => {
+            document.getElementById('messageInput').value = reply.value;
+            hideQuickReplies();
+            sendMessage();
+        };
+        container.appendChild(chip);
+    });
+
+    // Scroll into view
+    container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hideQuickReplies() {
+    const container = document.getElementById('quickRepliesContainer');
+    container.style.display = 'none';
+    container.innerHTML = '';
 }
 
 // ─── UI Helpers ─────────────────────────────────────
@@ -147,6 +245,8 @@ function showWelcome() {
     document.getElementById('messagesContainer').style.display = 'none';
     document.getElementById('messagesContainer').innerHTML = '';
     document.getElementById('currentSentiment').innerHTML = '';
+    hideQuickReplies();
+    closeCrisisBanner();
 }
 
 function addMessage(role, content, sentiment = null) {
@@ -159,7 +259,7 @@ function addMessage(role, content, sentiment = null) {
         ? (user?.username || 'U')[0].toUpperCase()
         : '🧠';
 
-    // Format content - convert markdown-like bold
+    // Format content - convert markdown-like bold and line breaks
     const formattedContent = content
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\n/g, '<br>');
@@ -219,23 +319,17 @@ function showTyping(visible) {
     }
 }
 
-function showCrisisAlert() {
-    // Remove existing alert if any
-    const existing = document.querySelector('.crisis-alert');
-    if (existing) existing.remove();
+// ─── Crisis Banner ──────────────────────────────────
+function showCrisisBanner() {
+    const banner = document.getElementById('crisisBanner');
+    banner.style.display = 'block';
+    banner.classList.add('animate-in');
+}
 
-    const alert = document.createElement('div');
-    alert.className = 'crisis-alert';
-    alert.innerHTML = `
-    <h4>🆘 Crisis Resources Available</h4>
-    <p style="color: var(--text-secondary); font-size: 0.88rem;">
-      If you're in immediate danger, please contact:
-      <strong style="color: var(--text-primary);">988 Suicide & Crisis Lifeline (call/text 988)</strong> or
-      <strong style="color: var(--text-primary);">Crisis Text Line (text HOME to 741741)</strong>
-    </p>`;
-
-    const container = document.getElementById('messagesContainer');
-    container.parentElement.insertBefore(alert, container.nextSibling);
+function closeCrisisBanner() {
+    const banner = document.getElementById('crisisBanner');
+    banner.style.display = 'none';
+    banner.classList.remove('animate-in');
 }
 
 // ─── Chat History ───────────────────────────────────
@@ -270,9 +364,24 @@ function renderChatList(chats) {
         const item = document.createElement('div');
         item.className = `chat-list-item ${chat._id === currentChatId ? 'active' : ''}`;
         item.onclick = () => loadChat(chat._id);
-        item.innerHTML = `💬 ${chat.title || 'Untitled'}`;
+
+        // Show mood emoji based on mood state
+        const moodEmoji = getMoodEmoji(chat.moodState?.mood);
+        item.innerHTML = `${moodEmoji} ${chat.title || 'Untitled'}`;
         list.appendChild(item);
     });
+}
+
+function getMoodEmoji(mood) {
+    if (!mood) return '💬';
+    const lower = mood.toLowerCase();
+    if (lower.includes('sad') || lower.includes('down') || lower.includes('depress')) return '😔';
+    if (lower.includes('anxious') || lower.includes('worr')) return '😰';
+    if (lower.includes('stress') || lower.includes('overwhelm')) return '😤';
+    if (lower.includes('angry') || lower.includes('frustrat')) return '😡';
+    if (lower.includes('lonely') || lower.includes('isolat')) return '😢';
+    if (lower.includes('good') || lower.includes('okay') || lower.includes('happy')) return '😊';
+    return '💬';
 }
 
 async function loadChat(chatId) {
@@ -288,6 +397,15 @@ async function loadChat(chatId) {
 
         // Show chat area
         showChatArea();
+        hideQuickReplies();
+
+        // Check if crisis was detected in any message
+        const hasCrisis = data.chat.messages.some(msg => msg.isCrisis);
+        if (hasCrisis) {
+            showCrisisBanner();
+        } else {
+            closeCrisisBanner();
+        }
 
         // Clear and render messages
         const container = document.getElementById('messagesContainer');
@@ -299,7 +417,8 @@ async function loadChat(chatId) {
 
         // Update active state
         document.querySelectorAll('.chat-list-item').forEach(el => el.classList.remove('active'));
-        event.target.closest('.chat-list-item')?.classList.add('active');
+        const clickedItem = document.querySelector(`.chat-list-item.active`) || event?.target?.closest('.chat-list-item');
+        if (clickedItem) clickedItem.classList.add('active');
 
         // Update title
         document.getElementById('chatTitle').textContent = data.chat.title || 'MindfulChat';
